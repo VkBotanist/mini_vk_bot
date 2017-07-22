@@ -4,10 +4,28 @@
 __author__ = 'ipetrash'
 
 
-# TODO: print заменить на логер
 # TODO: обрабатывать не последнее полученное сообщение, а пачку, например 100
 
 from config import LOGIN, PASSWORD
+
+
+def get_logger(name):
+    import logging
+    log = logging.getLogger(name)
+    log.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter('[%(asctime)s] %(message)s')
+
+    import sys
+    ch = logging.StreamHandler(stream=sys.stdout)
+    ch.setLevel(logging.DEBUG)
+    ch.setFormatter(formatter)
+    log.addHandler(ch)
+
+    return log
+
+
+log = get_logger('mini_vk_bot')
 
 
 def get_random_quotes_list():
@@ -80,7 +98,7 @@ if __name__ == '__main__':
     while True:
         try:
             rs = vk.method('messages.get', messages_get_values)
-            # print(rs)
+            # log.debug(rs)
 
             # Если ничего не пришло
             if not rs['items']:
@@ -94,7 +112,7 @@ if __name__ == '__main__':
             if not message.lower().startswith(command_prefix.lower()):
                 continue
 
-            print('    From user #{}, message (#{}): "{}"'.format(from_user_id, message_id, message))
+            log.debug('    From user #%s, message (#%s): "%s"', from_user_id, message_id, message)
             command = message[len(command_prefix):].strip()
 
             message = ''
@@ -118,14 +136,13 @@ if __name__ == '__main__':
             if not message:
                 message = 'Не получилось выполнить команду "{}" :( Попробуй позже повторить :)'.format(command)
 
-            print(message)
+            log.debug(message)
 
             last_message_bot_id = vk.method('messages.send', {'user_id': from_user_id, 'message': message})
             messages_get_values['last_message_id'] = last_message_bot_id
 
         except Exception as e:
-            import traceback
-            print('Error:', traceback.format_exc())
+            log.exception('Error:')
 
         finally:
             import time
