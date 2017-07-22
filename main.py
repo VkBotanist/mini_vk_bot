@@ -73,7 +73,6 @@ if __name__ == '__main__':
             log.debug('    From user #%s, message (#%s): "%s"', from_user_id, message_id, message)
             command = message[len(command_prefix):].strip()
 
-            # ...
             message = ''
 
             # Если текущая команда не была найдена среди списка команд хотя бы по совпадению начальной строки
