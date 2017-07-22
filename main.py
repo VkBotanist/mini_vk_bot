@@ -4,9 +4,52 @@
 __author__ = 'ipetrash'
 
 
+# TODO: print заменить на логер
 # TODO: обрабатывать не последнее полученное сообщение, а пачку, например 100
 
 from config import LOGIN, PASSWORD
+
+
+def get_random_quotes_list():
+    quotes = list()
+
+    import requests
+    rs = requests.get('http://bash.im/random')
+
+    from lxml import etree
+    root = etree.HTML(rs.content)
+
+    for quote_el in root.xpath('//*[@class="quote"]'):
+        try:
+            text_el = quote_el.xpath('*[@class="text"]')[0]
+            quote_text = '\n'.join(text.encode('ISO8859-1').decode('cp1251') for text in text_el.itertext())
+
+            quotes.append(quote_text)
+
+        except IndexError:
+            pass
+
+    return quotes
+
+
+# Хранилище цитат башорга, из которого будут браться цитаты
+# Когда этот список будет пустым, оно будет заполнено с сайта.
+QUOTES_LIST = list()
+
+
+def get_random_quote():
+    global QUOTES_LIST
+
+    # Если пустой, запрос и заполняем список новыми цитатами
+    if not QUOTES_LIST:
+        QUOTES_LIST += get_random_quotes_list()
+
+    # Перемешиваем список цитат и берем последний элемент
+    import random
+    random.shuffle(QUOTES_LIST)
+
+    # Удаление и возврат последнего элемента из списка
+    return QUOTES_LIST.pop()
 
 
 if __name__ == '__main__':
@@ -14,7 +57,7 @@ if __name__ == '__main__':
     vk = vk_api.VkApi(login=LOGIN, password=PASSWORD)
     vk.auth()
 
-    command_prefix = 'Бот, '
+    command_prefix = 'Бот,'
 
     all_commands = {
         'насмеши': 'Случайная цитата башорга',
@@ -24,11 +67,6 @@ if __name__ == '__main__':
         'котики': ':3',
         'команды': 'Показать список команд',
     }
-
-    # Ограничение бота, чтобы он не отвечал на свои же сообщения
-    # Для снятие ограничения: bot_user_id = None
-    rs = vk.method('users.get')
-    bot_user_id = rs[0]['id']
 
     last_message_bot_id = None
 
@@ -52,20 +90,17 @@ if __name__ == '__main__':
             from_user_id = rs['items'][0]['user_id']
             message = rs['items'][0]['body']
 
-            # Не будем отвечать на собственное сообщение
-            if from_user_id == bot_user_id:
-                continue
-
             # Бот реагирует только на сообщения, начинающиеся с префикса
             if not message.lower().startswith(command_prefix.lower()):
                 continue
 
             print('    From user #{}, message (#{}): "{}"'.format(from_user_id, message_id, message))
-            command = message[len(command_prefix):]
+            command = message[len(command_prefix):].strip()
 
             message = ''
 
-            if command.lower() not in all_commands:
+            # Если текущая команда не была найдена среди списка команд хотя бы по совпадению начальной строки
+            if not any(command.lower().startswith(x) for x in all_commands):
                 message = 'Получена неизвестная команда "{}".\n' \
                           'Чтобы узнать команды введи: "Бот, команды"'.format(command)
 
@@ -74,20 +109,16 @@ if __name__ == '__main__':
 
                 # TODO: для каждой команды отдельный поток создавать
 
-                if command == 'команды':
+                if command.startswith('команды'):
                     message = '\n'.join('{}: {}'.format(k, v) for k, v in all_commands.items())
 
-                all_commands = {
-                    'насмеши': 'Случайная цитата башорга',
-                    'ругнись': 'Ругательство с матогенератора',
-                    'погода': 'Погода в указанном городе. Например: "Бот, погода магнитогорск"',
-                    'что посмотреть': 'Рандомная ссылка на кинопоиск',
-                    'котики': ':3',
-                    'команды': 'Показать список команд',
-                }
+                elif command.startswith('насмеши'):
+                    message = get_random_quote()
 
             if not message:
                 message = 'Не получилось выполнить команду "{}" :( Попробуй позже повторить :)'.format(command)
+
+            print(message)
 
             last_message_bot_id = vk.method('messages.send', {'user_id': from_user_id, 'message': message})
             messages_get_values['last_message_id'] = last_message_bot_id
