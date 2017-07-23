@@ -46,6 +46,7 @@ if __name__ == '__main__':
     import vk_api
     vk = vk_api.VkApi(login=LOGIN, password=PASSWORD)
     vk.auth()
+    log.debug("Бот запущен")
 
     command_prefix = 'Бот,'
 
@@ -75,7 +76,7 @@ if __name__ == '__main__':
             if not message.lower().startswith(command_prefix.lower()):
                 continue
 
-            log.debug('    From user #%s, message (#%s): "%s"', from_user_id, message_id, message)
+            log.debug('From user #%s, message (#%s): "%s"', from_user_id, message_id, message)
             command = message[len(command_prefix):].strip()
 
             # Выполнение команды
