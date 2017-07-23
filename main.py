@@ -35,15 +35,6 @@ if __name__ == '__main__':
 
     command_prefix = 'Бот,'
 
-    all_commands = {
-        'насмеши': 'Случайная цитата башорга',
-        'ругнись': 'Ругательство с матогенератора',
-        'погода': 'Погода в указанном городе. Например: "Бот, погода магнитогорск"',
-        'что посмотреть': 'Рандомная ссылка на кинопоиск',
-        'котики': ':3',
-        'команды': 'Показать список команд',
-    }
-
     last_message_bot_id = None
 
     messages_get_values = {
@@ -73,25 +64,11 @@ if __name__ == '__main__':
             log.debug('    From user #%s, message (#%s): "%s"', from_user_id, message_id, message)
             command = message[len(command_prefix):].strip()
 
-            message = ''
+            # Выполнение команды
+            import commands
+            message = commands.execute(command)
 
-            # Если текущая команда не была найдена среди списка команд хотя бы по совпадению начальной строки
-            if not any(command.lower().startswith(x) for x in all_commands):
-                message = 'Получена неизвестная команда "{}".\n' \
-                          'Чтобы узнать команды введи: "Бот, команды"'.format(command)
-
-            else:
-                command = command.lower()
-
-                # TODO: для каждой команды отдельный поток создавать
-
-                if command.startswith('команды'):
-                    message = '\n'.join('{}: {}'.format(k, v) for k, v in all_commands.items())
-
-                elif command.startswith('насмеши'):
-                    from commands import fun
-                    message = fun.get_random_quote()
-
+            # Если ответа от бота нет
             if not message:
                 message = 'Не получилось выполнить команду "{}" :( Попробуй позже повторить :)'.format(command)
 
