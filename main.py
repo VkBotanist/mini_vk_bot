@@ -28,6 +28,20 @@ def get_logger(name):
 log = get_logger('mini_vk_bot')
 
 
+# Отлов необработанныз исключений и закрытие
+def log_uncaught_exceptions(ex_cls, ex, tb):
+    text = '{}: {}:\n'.format(ex_cls.__name__, ex)
+    import traceback
+    text += ''.join(traceback.format_tb(tb))
+
+    log.error(text)
+    quit()
+
+
+import sys
+sys.excepthook = log_uncaught_exceptions
+
+
 if __name__ == '__main__':
     import vk_api
     vk = vk_api.VkApi(login=LOGIN, password=PASSWORD)
