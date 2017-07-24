@@ -6,7 +6,7 @@ __author__ = 'ipetrash'
 
 ALL_COMMANDS = {
     'насмеши': 'Случайная цитата башорга',
-    'ругнись': 'Ругательство с матогенератора',
+    'ругнись': 'Напиши кого бот отругает. Например: "Бот, ругнись петр иваныч"',
     'погода': 'Погода в указанном городе. Например: "Бот, погода магнитогорск"',
     'что посмотреть': 'Рандомная ссылка на кинопоиск',
     'котики': ':3',
@@ -21,16 +21,27 @@ def execute(command):
                'Чтобы узнать команды введи: "Бот, команды"'.format(command)
 
     else:
-        command = command.lower()
-
         # TODO: для каждой команды отдельный поток создавать
         message = ''
 
-        if command.startswith('команды'):
-            message = '\n'.join('{}: {}'.format(k, v) for k, v in ALL_COMMANDS.items())
+        # Приведение в нижний регистр чтобы проверка команды была регистронезависимой
+        execute_command = command.lower()
 
-        elif command.startswith('насмеши'):
+        if execute_command.startswith('команды'):
+            return '\n'.join('{}: {}'.format(k, v) for k, v in ALL_COMMANDS.items())
+
+        elif execute_command.startswith('насмеши'):
             from commands import fun
-            message = fun.get_random_quote()
+            return fun.get_random_quote()
+
+        elif execute_command.startswith('ругнись'):
+            # Вытаскивание имени того, кого нужно обругать
+            name = command[len('ругнись'):].strip()
+
+            if not name:
+                return 'Не удалось выполнить команду "ругнись": нужно указать имя.'
+
+            from commands import damn
+            return damn.damn(name)
 
     return message
