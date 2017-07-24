@@ -79,6 +79,7 @@ if __name__ == '__main__':
             log.debug('From user #%s, message (#%s): "%s"', from_user_id, message_id, message)
             command = message[len(command_prefix):].strip()
 
+            # TODO: для каждой команды отдельный поток создавать
             # Выполнение команды
             import commands
             message = commands.execute(command)
