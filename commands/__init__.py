@@ -38,7 +38,7 @@ def execute(command):
             name = command[len('ругнись'):].strip()
 
             if not name:
-                return 'Не удалось выполнить команду "ругнись": нужно указать имя.'
+                name = 'Бот'
 
             from commands import damn
             return damn.damn(name)
