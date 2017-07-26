@@ -5,6 +5,8 @@ __author__ = 'ipetrash'
 
 
 # TODO: обрабатывать не последнее полученное сообщение, а пачку, например 100
+# TODO: логировать в файл
+#
 
 from config import LOGIN, PASSWORD
 
@@ -80,6 +82,10 @@ if __name__ == '__main__':
             command = message[len(command_prefix):].strip()
 
             # TODO: для каждой команды отдельный поток создавать
+            # Пример: https://www.ibm.com/developerworks/ru/library/l-python_part_9/index.html#N10078
+            # только поток нужно без демона использовать, демон указывает что при закрытии главного потока
+            # должны и потоки-демоны завершиться, что для текущей задачи не будет правильным
+            
             # Выполнение команды
             import commands
             message = commands.execute(command)
