@@ -6,7 +6,8 @@ __author__ = 'ipetrash'
 
 # TODO: обрабатывать не последнее полученное сообщение, а пачку, например 100
 # TODO: логировать в файл
-#
+# TODO: В messages.get (https://vk.com/dev/messages.get) передавать параметр preview_length
+#       чтобы запрашиваемые команды были ограничены
 
 from config import LOGIN, PASSWORD
 
