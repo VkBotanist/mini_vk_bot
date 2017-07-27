@@ -70,15 +70,24 @@ if __name__ == '__main__':
             if not rs['items']:
                 continue
 
-            message_id = rs['items'][0]['id']
-            from_user_id = rs['items'][0]['user_id']
-            message = rs['items'][0]['body']
+            item = rs['items'][0]
+            message_id = item['id']
+            from_user_id = item['user_id']
+            message = item['body']
+
+            # Если сообщение пришло из групповой беседы, в chat_id будет число, иначе None
+            chat_id = item.get('chat_id', None)
 
             # Бот реагирует только на сообщения, начинающиеся с префикса
             if not message.lower().startswith(command_prefix.lower()):
                 continue
 
-            log.debug('From user #%s, message (#%s): "%s"', from_user_id, message_id, message)
+            if chat_id:
+                log.debug('From chat #%s from user #%s, message (#%s): "%s"',
+                          chat_id, from_user_id, message_id, message)
+            else:
+                log.debug('From user #%s, message (#%s): "%s"', from_user_id, message_id, message)
+
             command = message[len(command_prefix):].strip()
 
             # TODO: для каждой команды отдельный поток создавать
@@ -96,7 +105,18 @@ if __name__ == '__main__':
 
             log.debug(message)
 
-            last_message_bot_id = vk.method('messages.send', {'user_id': from_user_id, 'message': message})
+            messages_send_values = {
+                'message': message,
+                'version': '5.67'
+            }
+
+            # Если сообщение пришло из групповой беседы
+            if chat_id:
+                messages_send_values['chat_id'] = chat_id
+            else:
+                messages_send_values['user_id'] = from_user_id
+
+            last_message_bot_id = vk.method('messages.send', messages_send_values)
             messages_get_values['last_message_id'] = last_message_bot_id
 
         except Exception as e:
