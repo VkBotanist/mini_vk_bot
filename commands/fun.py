@@ -5,7 +5,7 @@ __author__ = 'ipetrash'
 
 
 def get_random_quotes_list():
-    quotes = list()
+    quotes = []
 
     import requests
     rs = requests.get('http://bash.im/random')
@@ -28,19 +28,19 @@ def get_random_quotes_list():
 
 # Хранилище цитат башорга, из которого будут браться цитаты
 # Когда этот список будет пустым, оно будет заполнено с сайта.
-QUOTES_LIST = list()
+CACHE_QUOTES = []
 
 
 def get_random_quote():
-    global QUOTES_LIST
+    global CACHE_QUOTES
 
     # Если пустой, запрос и заполняем список новыми цитатами
-    if not QUOTES_LIST:
-        QUOTES_LIST += get_random_quotes_list()
+    if not CACHE_QUOTES:
+        CACHE_QUOTES += get_random_quotes_list()
 
     # Перемешиваем список цитат и берем последний элемент
     import random
-    random.shuffle(QUOTES_LIST)
+    random.shuffle(CACHE_QUOTES)
 
     # Удаление и возврат последнего элемента из списка
-    return QUOTES_LIST.pop()
+    return CACHE_QUOTES.pop()
