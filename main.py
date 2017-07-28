@@ -97,8 +97,13 @@ if __name__ == '__main__':
             # должны и потоки-демоны завершиться, что для текущей задачи не будет правильным
             
             # Выполнение команды
-            import commands
-            message = commands.execute(command)
+            try:
+                import commands
+                message = commands.execute(command)
+
+            except Exception as e:
+                log.exception("Error:")
+                message = 'При выполнении команды "{}" произошла ошибка: "{}"'.format(command, e)
 
             # Если ответа от бота нет
             if not message:
