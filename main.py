@@ -77,7 +77,7 @@ if __name__ == '__main__':
             message = item['body']
 
             # Если сообщение пришло из групповой беседы, в chat_id будет число, иначе None
-            chat_id = item.get('chat_id', None)
+            chat_id = item.get('chat_id')
 
             # Бот реагирует только на сообщения, начинающиеся с префикса
             if not message.lower().startswith(command_prefix.lower()):
