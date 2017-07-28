@@ -103,13 +103,16 @@ if __name__ == '__main__':
 
             except Exception as e:
                 log.exception("Error:")
-                message = 'При выполнении команды "{}" произошла ошибка: "{}"'.format(command, e)
+
+                import traceback
+                message = 'При выполнении команды "{}" произошла ошибка: ' \
+                          '"{}":\n\n{}'.format(command, e, traceback.format_exc())
 
             # Если ответа от бота нет
             if not message:
                 message = 'Не получилось выполнить команду "{}" :( Попробуй позже повторить :)'.format(command)
 
-            log.debug(message)
+            log.debug('Message: "%s"', message)
 
             messages_send_values = {
                 'message': message,
