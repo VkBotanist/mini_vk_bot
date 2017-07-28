@@ -13,7 +13,8 @@ __author__ = 'ipetrash'
 ALL_COMMANDS = {
     'насмеши': 'Случайная цитата башорга',
     'ругнись': 'Напиши кого бот отругает. Например: "Бот, ругнись петр иваныч"',
-    # 'погода': 'Погода в указанном городе. Например: "Бот, погода магнитогорск"',
+    'погода': 'Погода в указанном населенном пункте. Например: "Бот, погода магнитогорск" или '
+              '"бот, погода село кукуево"',
     # 'что посмотреть': 'Рандомная ссылка на кинопоиск',
     # 'котики': ':3',
     'команды': 'Показать список команд',
@@ -48,11 +49,18 @@ def execute(command):
         elif execute_command.startswith('ругнись'):
             # Вытаскивание имени того, кого нужно обругать
             name = command[len('ругнись'):].strip()
-
             if not name:
                 name = 'Бот'
 
             from commands import damn
             return damn.damn(name)
+
+        elif execute_command.startswith('погода'):
+            city = command[len('погода'):].strip()
+            if not city:
+                return "Не правильно указана команда погода, не указан населенный пункт"
+
+            from commands import weather_in_city
+            return weather_in_city.get_weather(city)
 
     return message
