@@ -58,7 +58,7 @@ def execute(command):
         elif execute_command.startswith('погода'):
             city = command[len('погода'):].strip()
             if not city:
-                return "Не правильно указана команда погода, не указан населенный пункт"
+                return "Неправильная команда 'погода': не указан населенный пункт"
 
             from commands import weather_in_city
             return weather_in_city.get_weather(city)
